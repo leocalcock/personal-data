@@ -1,3 +1,7 @@
 # Ignoring data and results
 /data
 
+
+data collection/test.json
+
+data collection/.Rhistory
