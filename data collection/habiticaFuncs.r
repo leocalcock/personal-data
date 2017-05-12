@@ -1,7 +1,7 @@
 #BUGGY get request with my password/user and a task
 library(httr)
 library(jsonlite)
-
+library(data.table)
 
 # path is path to the data folder. currently does not install R packages
 setup <- function(user, pw, path = "../data"){
@@ -43,7 +43,7 @@ getTask <- function(taskID, user = NULL, pw = NULL){
       gr <- GET(paste0("https://habitica.com/api/v3/tasks/", taskID),
                 add_headers(.headers = c("x-api-user" = user,"x-api-key" = pw)))
       if(gr$status_code == 200){
-            ret = content(gr,"text")
+            ret = content(gr,"text","fromJSON")
       }
       ret
 }
@@ -95,11 +95,9 @@ setTasks <- function(uspw = NULL, overwrite = T, path = "../data/habitica"){
       for(i in 1:length(notes)){
             t <- track(notes[i])
             if(t[1]){
-                  #print(paste("SUCCESSSSS",ids[i]))
                   idLs <- c(idLs,as.character(ids[i]))
                   v <- t[2]
                   if(v %in% varLs){
-                        print("WHYYYY")
                         index <- which(v==varLs)
                         vars[[index]]$ids <- c(vars[[index]]$ids,ids[i])
                   }else{
@@ -114,4 +112,60 @@ setTasks <- function(uspw = NULL, overwrite = T, path = "../data/habitica"){
       close(fc)
 }
 
+#Beginning of collecting data (to be run after setTasks()) weekOf in format %Y-%m-%d
+collectData <- function(weekOf = "",tz = Sys.timezone(), pathPre = "../data/habitica/data"){
+      day = 86400 # number of seconds in a week. 
+      if(weekOf!=""){
+            t1 <- as.POSIXct(weekOf)
+            DT <-cData(t1,7, path = paste0(pathPre,"/Hab",weekOf,".csv"))
+            DT
+      }else{
+      NULL}
+}
+#t1, POSIXct format, path = path to file to write data to. for now collects tables for day by day. 
+cData <- function(t1, days, path, uspw = NULL){
+      if(is.null(uspw))uspw <- readUserPw()
+      day <- 86400
+      fi <- file("../data/habitica/taskIDs.json")# made need to add an argument for this.
+      txt <- readLines(fi)
+      close(fi)
+      taskMeta <- fromJSON(txt)$variables
+      d1 <- as.numeric(t1)
+      unT <- vector(mode = "numeric",length = 0)
+      for(i in 1:days){
+            unT <- c(unT,d1)
+            d1 <- d1+day
+      }
+      #print(taskMeta)
+      vars <- taskMeta$varname
+      DT <- data.table(unixTime = unT)
+      DT[,date:=format(as.POSIXct(unixTime,origin = "1970-01-01"),"%Y-%m-%d")]
+      #use setnamesx
+      t1Num <- as.numeric(t1)
+      for(i in seq_along(vars)){
+            var <- taskMeta$varname[i]
+            DTC <- vector("numeric",days)
+            # to subset add an argument at end with = F
+            idsC <- taskMeta[i,]$ids[[1]]
+            for(j in seq_along(idsC)){
+                  task <- getTask(idsC[j], uspw[1],uspw[2])
+                  if(!is.null(task)){
+                  taskDate <- fromJSON(task)$data$history$date
+                  for(k in seq_along(taskDate)){
+                        reduced <- floor((taskDate[k]-1000*t1Num)/(1000*day)) 
+                        #print(reduced)
+                        if(0<=reduced&reduced < days){
+                              DTC[reduced+1] <- DTC[reduced+1]+1
+                              #if(vars[i]=="lectures")print(as.POSIXlt(taskDate[k]/1000,orig = "1970-01-01"))
+                        }
+                  }
+                  }else{ print("You have deleted tasks;should rerun setTasks()")}
+            }
+            
+            DT[,t:=DTC]
+            setnames(DT,"t",vars[i][[1]])
+      }
+      write.csv(DT,file = path)
+      DT
+}
 
