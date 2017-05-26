@@ -1,4 +1,3 @@
-#BUGGY get request with my password/user and a task
 library(httr)
 library(jsonlite)
 library(data.table)
@@ -120,10 +119,13 @@ collectData <- function(weekOf = "",tz = Sys.timezone(), pathPre = "../data/habi
             DT <-cData(t1,7, path = paste0(pathPre,"/Hab",weekOf,".csv"))
             DT
       }else{
-      NULL}
+            NULL}
 }
 #t1, POSIXct format, path = path to file to write data to. for now collects tables for day by day. 
-cData <- function(t1, days, path, uspw = NULL){
+# http://habitica.wikia.com/wiki/Thread:48911
+# http://habitica.wikia.com/wiki/Cron
+# can't name variable t (perhaps can fix this by sorting and putting t variable last.)
+cData <- function(t1, days, path = NULL, uspw = NULL){
       if(is.null(uspw))uspw <- readUserPw()
       day <- 86400
       fi <- file("../data/habitica/taskIDs.json")# made need to add an argument for this.
@@ -136,36 +138,54 @@ cData <- function(t1, days, path, uspw = NULL){
             unT <- c(unT,d1)
             d1 <- d1+day
       }
-      #print(taskMeta)
+      
       vars <- taskMeta$varname
       DT <- data.table(unixTime = unT)
       DT[,date:=format(as.POSIXct(unixTime,origin = "1970-01-01"),"%Y-%m-%d")]
-      #use setnamesx
       t1Num <- as.numeric(t1)
       for(i in seq_along(vars)){
             var <- taskMeta$varname[i]
             DTC <- vector("numeric",days)
             # to subset add an argument at end with = F
             idsC <- taskMeta[i,]$ids[[1]]
+            #loop over ids for a particular variable
             for(j in seq_along(idsC)){
                   task <- getTask(idsC[j], uspw[1],uspw[2])
                   if(!is.null(task)){
-                  taskDate <- fromJSON(task)$data$history$date
-                  for(k in seq_along(taskDate)){
-                        reduced <- floor((taskDate[k]-1000*t1Num)/(1000*day)) 
-                        #print(reduced)
-                        if(0<=reduced&reduced < days){
-                              DTC[reduced+1] <- DTC[reduced+1]+1
-                              #if(vars[i]=="lectures")print(as.POSIXlt(taskDate[k]/1000,orig = "1970-01-01"))
+                        data <- fromJSON(task)$data
+                        taskDate <- data$history$date
+                        taskValue <- data$history$value
+                        taskIsDaily <- data$type=="daily"
+                        
+                        #loop over "history" for a particular task corresponding to an ID
+                        for(k in seq_along(taskDate)){
+                              #convert to a day which corresponds to the data table. 
+                              reduced <- floor((taskDate[k]-1000*t1Num)/(1000*day)) 
+                              #Handling of habit vs. handling of daily. 
+                              if(0<=reduced&reduced<days){
+                                    #habit case 
+                                    if(!taskIsDaily){
+                                          #reduced is 0 days range :p
+                                          DTC[reduced+1] <- DTC[reduced+1]+1
+                                          #Daily case
+                                    }else if(k < length(taskDate)){
+                                          #only if the values move up, does it mean you did the daily. edge case for if this is the first time you created task. 
+                                          diff <- taskValue[k+1] - taskValue[k] 
+                                          if(diff > 0|(k==1&(taskValue[1]>0))){
+                                                DTC[reduced+1] <- DTC[reduced+1]+1
+                                          }
+                                    }
+                              }
+                              
                         }
-                  }
-                  }else{ print("You have deleted tasks;should rerun setTasks()")}
+                  }else{print(paste0("You have deleted task. ID:",idsC[j]," var:",vars[i],". should rerun setTasks()"))}
             }
             
+            #Due to the stupid way that R works, had to do this (seriously this language ;-;). So you cannot name a variable "t" or it will be lost. 
             DT[,t:=DTC]
             setnames(DT,"t",vars[i][[1]])
       }
-      write.csv(DT,file = path)
+      if(!is.null(path))write.csv(DT,file = path)
       DT
 }
 
