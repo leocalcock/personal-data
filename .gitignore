@@ -7,3 +7,7 @@ data collection/test.json
 data collection/.Rhistory
 .Rhistory
 pdatanotes.txt
+
+*.json
+
+README.html

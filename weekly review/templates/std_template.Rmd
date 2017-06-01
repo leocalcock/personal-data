@@ -1,0 +1,23 @@
+---
+title: "Weekly Review"
+author: "[enter name]"
+date: "[enter weekOfDate]"
+output: pdf_document
+---
+```{r data, echo = F, warning = F}
+#put code for loading data here 
+```
+
+#Summary 
+
+
+
+##Key Plots
+
+
+##Notes
+
+#Goals for next week
+
+
+
