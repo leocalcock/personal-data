@@ -112,11 +112,13 @@ setTasks <- function(uspw = NULL, overwrite = T, path = "../data/habitica"){
 }
 
 #Beginning of collecting data (to be run after setTasks()) weekOf in format %Y-%m-%d
-collectData <- function(weekOf = "",tz = Sys.timezone(), pathPre = "../data/habitica/data"){
+collectData <- function(weekOf = "",tz = Sys.timezone(), pathPre = "../data/habitica/data", write = TRUE){
       day = 86400 # number of seconds in a week. 
       if(weekOf!=""){
-            t1 <- as.POSIXct(weekOf)
-            DT <-cData(t1,7, path = paste0(pathPre,"/Hab",weekOf,".csv"))
+            t1 <- as.POSIXct(weekOf, tz = tz)
+            pth <- paste0(pathPre,"/Hab",weekOf,".csv")
+            if(!write)pth = NULL
+            DT <-cData(t1,7, pth)
             DT
       }else{
             NULL}

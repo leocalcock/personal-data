@@ -22,3 +22,26 @@ can even give two separate tasks the same variable name and it will track them t
 for both "Go to school" and "Visit the park". Important detail: you can't use the variable name "t". You can rerun `setTasks()` at any time and it will reset variables to track based on your habitica account.
 
 `collectData()` collects your data (hurdur?). It creates a csv with the past week's data. E.G. run `collectData(YYYY-MM-DD)` to create your .csv for that week. 
+
+#### habiticaFuncs.r codedoc
+`setup(user,pw,path)` pass UserID, APIToken, and path to the data folder (folder which you want to set up habitica data).
+default is path = "../data".
+
+`readUserPw()` takes no arguments and returns a tuple with your UserID and APIToken. (assumes ../data path)
+
+`getTask(taskId,user,pw)` Given a taskId, uses a get request to get the task's data and returns json text if the request
+is successful and `NULL` if the request fails. Used in `cData()` and furthermore `collectData()`.
+
+`getTasks(user, pw)` Given UserID and APIToken, does a GET request to get task data and returns .json text for tasks. (returns NULL if failed request) `setTasks()` uses this. 
+
+`setTasks(uspw,overwrite,path)` uspw is a tuple of UserID and APIToken, overwrite currently doesn't do anything, and path
+is the path to the habitica folder in your data folder. It resets/makes taskIDs.json in the habitica folder which encodes
+json pairs of (variablename,idList) consisting of a variable name and a list of habitica task ids which correspond to that
+variablename. 
+
+`collectData(weekOf,tz,pathPre,write)` weekOf is the starting day of the week (inclusive) for collecting the data (YYYY-MM-DD), tz is the timezone for the date, pathPre is a path to the data folder within the habitica folder. write specifies
+whether to write the data (the function returns a data table).
+
+`cData(t1,days,path,uspw)` Mainly a helper function to `collectData()`. t1 is a POSIXct for the starting day and days is
+the number of days to track for a csv. path is the path to where to write the data file and uspw is the UserID-APIToken tuple.
+
