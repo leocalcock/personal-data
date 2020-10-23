@@ -1,5 +1,34 @@
 # personal-data
+
 At the moment this is just a collection of scripts for collecting and organizing personal data for analysis. 
+
+Current Data Stack (10/22/2020):
+* RescueTime
+* Fitbit
+* Google forms/sheets
+* Todoist
+
+#### October 22nd 2020 update: Shifting to data tracking in 2020 
+
+Seems like a useful bunch of code but going to shift to a stack of data collection, compilation/cleaning, and analysis including but not limited to sources such as: RescueTime, ATracker Pro, FitBit, Todoist, google sheets, youtube, and others. With this, first step is going to reorganize code a bit into the following sections: data collection, data cleaning, data analysis, personal code, setup, and reviews. Data collection will collect stricly *raw data* and be divided among folders for each source. Data cleaning will be a collection of scripts for, well, data cleaning - this should be done across data-sets and could include generation/setting of a codebook. Data analysis is scripts for analyzing data through summary statistics, visualizations, and others. Personal code is a .gitignore section for one's personal scripts. Setup is a piece of code for setting up some metadata for collection/purpose: apikeys, descriptions of what data collecting/why, etc. Reviews are stuff like Rmd/templates for going over data. 
+
+Restated in reordered list form:
+* Setup: script for filling out apikeys/metadata for info setup as well data folder etc. 
+  * Should create a JSON with all this information as well as last time setup and/or an update was run. 
+  * In future should allow for updating information. 
+  * Should create data folder.
+  * Have individual setup commands per data collection source. 
+* Data Collection: Functions to collect raw data 
+  * Broken down by source folder (e.g. "habitica")
+  * Should include pullall and pullall(date range) for getting data
+  * Should avoid reinventing the wheel too much - reference/use other code
+* Data Cleaning: scripts to clean up data and compile from sources - can be rather personalized. 
+* Data Analysis: Visualization/Analysis scripts
+* Personal Code: .gitignore folder 
+* Data Folder: .gitignore with raw data, metadata, clean data. Supermetadata: log file for data collection.
+* Reviews: Templates for review/analysis. 
+
+All of this is quite new/aspirational and none is set up. Perhaps the first thing to do is setup and second thing to do is code to pull raw data. 
 
 
 ## Code Doc:
