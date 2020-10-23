@@ -143,7 +143,7 @@ cData <- function(t1, days, path = NULL, uspw = NULL){
       
       vars <- taskMeta$varname
       DT <- data.table(unixTime = unT)
-      DT[,date:=format(as.POSIXct(unixTime,origin = "1970-01-01"),"%Y-%m-%d")]
+      DT[,date:=format(as.POSIXct(unixTime, origin = "1970-01-01"),"%Y-%m-%d")]
       t1Num <- as.numeric(t1)
       for(i in seq_along(vars)){
             var <- taskMeta$varname[i]
