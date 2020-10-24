@@ -5,6 +5,7 @@ At the moment this is just a collection of scripts for collecting and organizing
 Current Data Stack (10/22/2020):
 * RescueTime
 * Fitbit
+  * [DK Export](https://darekkay.com/todoist-export/) and [DK Source](https://github.com/darekkay/todoist-export) 
 * Google forms/sheets
 * Todoist
 
