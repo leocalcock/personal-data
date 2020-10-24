@@ -4,10 +4,12 @@ At the moment this is just a collection of scripts for collecting and organizing
 
 Current Data Stack (10/22/2020):
 * RescueTime
+  * [Some Article](https://willrenius.com/2018/10/08/how-to-download-and-analyze-your-rescuetime-data-in-r/#:~:text=To%20export%20your%20archive%20as,%E2%80%9Cdownload%20your%20data%20archive%E2%80%9D.) 
 * Fitbit
-  * [DK Export](https://darekkay.com/todoist-export/) and [DK Source](https://github.com/darekkay/todoist-export) 
+  * [Web Api](https://dev.fitbit.com/build/reference/web-api/basics/)
 * Google forms/sheets
 * Todoist
+  * [DK Export](https://darekkay.com/todoist-export/) and [DK Source](https://github.com/darekkay/todoist-export) 
 
 #### October 22nd 2020 update: Shifting to data tracking in 2020 
 
